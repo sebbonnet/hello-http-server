@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  test-app:
+    build:
+      context: .
+    image: ${REPO}:${VERSION}
+    container_name: http-server
