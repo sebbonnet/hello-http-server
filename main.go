@@ -18,19 +18,19 @@ func main() {
 
 	http.HandleFunc("/hello", func(writer http.ResponseWriter, request *http.Request) {
 		requestProcessed.Inc()
-		fmt.Fprintf(writer, "hello\n")
+		fmt.Fprintf(writer, "%s: hello!\n", currentTime())
 	})
 
 	http.HandleFunc("/error", func(writer http.ResponseWriter, request *http.Request) {
 		requestProcessed.Inc()
 		writer.WriteHeader(500)
-		fmt.Fprintf(writer, "not working\n")
+		fmt.Fprintf(writer, "%s: not working\n", currentTime())
 	})
 
 	http.HandleFunc("/bad", func(writer http.ResponseWriter, request *http.Request) {
 		requestProcessed.Inc()
 		writer.WriteHeader(400)
-		fmt.Fprintf(writer, "can't do this\n")
+		fmt.Fprintf(writer, "%s: can't do this\n", currentTime())
 	})
 
 	http.HandleFunc("/random/latency", func(writer http.ResponseWriter, request *http.Request) {
@@ -41,9 +41,13 @@ func main() {
 		time.Sleep(latency)
 
 		writer.WriteHeader(200)
-		fmt.Fprintf(writer, "request took %dms\n", latency.Milliseconds())
+		fmt.Fprintf(writer, "%s request took %dms\n", currentTime(), latency.Milliseconds())
 	})
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8080", nil)
+}
+
+func currentTime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }
