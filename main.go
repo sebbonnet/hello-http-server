@@ -2,47 +2,48 @@ package main
 
 import (
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "hello\n")
-}
-
-func broken(w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(500)
-	fmt.Fprintf(w, "not working\n")
-}
-
-func bad(w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(400)
-	fmt.Fprintf(w, "can't do this\n")
-}
-
-func randomLatency(w http.ResponseWriter, req *http.Request) {
-	// between 0 and 1.5s
-	latency := time.Duration(rand.Intn(1500)) * time.Millisecond
-	time.Sleep(latency)
-
-	w.WriteHeader(200)
-	fmt.Fprintf(w, "request took %dms\n", latency.Milliseconds())
-}
-
-func headers(w http.ResponseWriter, req *http.Request) {
-	for name, headers := range req.Header {
-		for _, h := range headers {
-			fmt.Fprintf(w, "%v: %v\n", name, h)
-		}
-	}
-}
-
 func main() {
-	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/headers", headers)
-	http.HandleFunc("/error", broken)
-	http.HandleFunc("/bad", bad)
-	http.HandleFunc("/random/latency", randomLatency)
+	requestProcessed := promauto.NewCounter(prometheus.CounterOpts{
+		Name: "myapp_processed_ops_total",
+		Help: "The total number of processed events",
+	})
+
+	http.HandleFunc("/hello", func(writer http.ResponseWriter, request *http.Request) {
+		requestProcessed.Inc()
+		fmt.Fprintf(writer, "hello\n")
+	})
+
+	http.HandleFunc("/error", func(writer http.ResponseWriter, request *http.Request) {
+		requestProcessed.Inc()
+		writer.WriteHeader(500)
+		fmt.Fprintf(writer, "not working\n")
+	})
+
+	http.HandleFunc("/bad", func(writer http.ResponseWriter, request *http.Request) {
+		requestProcessed.Inc()
+		writer.WriteHeader(400)
+		fmt.Fprintf(writer, "can't do this\n")
+	})
+
+	http.HandleFunc("/random/latency", func(writer http.ResponseWriter, request *http.Request) {
+		requestProcessed.Inc()
+
+		// between 0 and 2s
+		latency := time.Duration(rand.Intn(2000)) * time.Millisecond
+		time.Sleep(latency)
+
+		writer.WriteHeader(200)
+		fmt.Fprintf(writer, "request took %dms\n", latency.Milliseconds())
+	})
+
+	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8080", nil)
 }
