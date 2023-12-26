@@ -2,7 +2,7 @@ project_dir := $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 
 VERSION ?= $(shell git rev-parse --short HEAD)
 REPO ?= "docker.io"
-NAMESPACE ?= "seb-test"
+NAMESPACE ?= "my-test"
 
 build:
 	VERSION=$(VERSION) REPO=$(REPO) docker-compose build test-app
