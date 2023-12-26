@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  test-app:
+  my-app:
     build:
       context: .
     image: ${REPO}:${VERSION}

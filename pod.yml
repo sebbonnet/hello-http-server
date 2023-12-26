@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp
+  name: my-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: myapp
+      app: my-app
   template:
     metadata:
       labels:
-        app: myapp
+        app: my-app
     spec:
       terminationGracePeriodSeconds: 0
       containers:
-        - name: myapp
+        - name: my-app
           image: ${REPO}:${VERSION}
           ports:
             - name: web
@@ -23,12 +23,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: hello-seb
+  name: hello-world
   labels:
-    app: myapp
+    app: my-app
 spec:
   selector:
-    app: myapp
+    app: my-app
   ports:
     - name: web
       port: 80

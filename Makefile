@@ -5,8 +5,8 @@ REPO ?= "docker.io"
 NAMESPACE ?= "my-test"
 
 build:
-	VERSION=$(VERSION) REPO=$(REPO) docker-compose build test-app
-	VERSION=$(VERSION) REPO=$(REPO) docker-compose push test-app
+	VERSION=$(VERSION) REPO=$(REPO) docker-compose build my-app
+	VERSION=$(VERSION) REPO=$(REPO) docker-compose push my-app
 
 deploy:
 	VERSION=$(VERSION) REPO=$(REPO) envsubst < $(project_dir)/pod.yml | kubectl -n $(NAMESPACE) apply -f -

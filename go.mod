@@ -1,4 +1,4 @@
-module github.com/sky-uk/adtech-test-app
+module github.com/sky-uk/adtech-my-app
 
 go 1.19
 
