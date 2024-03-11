@@ -21,6 +21,11 @@ func main() {
 		fmt.Fprintf(writer, "%s: hello!\n", currentTime())
 	})
 
+	http.HandleFunc("/readyz", func(writer http.ResponseWriter, request *http.Request) {
+		requestProcessed.Inc()
+		fmt.Fprintf(writer, "%s: OK!\n", currentTime())
+	})
+
 	http.HandleFunc("/error", func(writer http.ResponseWriter, request *http.Request) {
 		requestProcessed.Inc()
 		writer.WriteHeader(500)
